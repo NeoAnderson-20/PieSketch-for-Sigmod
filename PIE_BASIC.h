@@ -6,11 +6,8 @@
 #include <utility>
 using namespace std;
 #define inf 2147483647
-//
 
-// 基础版 PIE
 
-// 过滤器， 没有变化
 template <typename ID_TYPE>
 class Filter_BASIC
 {
@@ -19,7 +16,7 @@ public:
     Filter_BASIC(int memory_KB)
     {
         d = 3;
-        w = memory_KB * 1024 * 8 / 8 / d; // 这里每个counter 只要设置8位！
+        w = memory_KB * 1024 * 8 / 8 / d; 
         array = new int *[d];
         for (int i = 0; i < d; i++)
         {
