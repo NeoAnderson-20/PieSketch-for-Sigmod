@@ -28,7 +28,7 @@ public:
         }
     }
 
-    inline int insert(ID_TYPE id) // 返回查询结果
+    inline int insert(ID_TYPE id) 
     {
         int result = inf;
 
@@ -36,7 +36,7 @@ public:
         {
             uint32_t index = mhash(id, i * 100) % w;
 
-            if (array[i][index] + 1 < max_value) // 此处存在问题
+            if (array[i][index] + 1 < max_value) 
             {
                 array[i][index]++;
             }
@@ -77,15 +77,14 @@ public:
         for (int i = 0; i < n_entries; i++)
         {
             if (entry[i].first == VV)
-            {                                     // 理论上，空位应该排在后面。  如果遍历到空位，应当直接放入！
-                if (entry[i].second < pow(2, 16)) //! 基础版的计数上限，16bit很少会溢出了
+            {                                     
+                if (entry[i].second < pow(2, 16)) 
                 {
                     entry[i].second++;
                 }
                 else
                 {
-                    // cout << "OVF16" << endl;
-                    // entry[i].second++;
+
                     return;
                 }
 
@@ -97,28 +96,27 @@ public:
                     }                                
                 }
 
-                return; // 匹配到
+                return; 
             }
             if (entry[i].first == 0)
             {
                 entry[i].first = VV;
                 entry[i].second = 1;
-                return; // 放入第一个空位
+                return;
             }
         }
 
-        // 未匹配到，末尾替换
         acc++;
         if (acc / entry[n_entries - 1].second > theta)
         {
             entry[n_entries - 1].first = VV;
             entry[n_entries - 1].second = 1;
-            acc = 0; // 替换一次后acc清空
+            acc = 0; 
             return;
         }
         else
         {
-            return; // 返回
+            return;
         }
     }
 
@@ -135,7 +133,7 @@ public:
         return 0;
     }
 
-    inline vector<pair<int, int>> pie_query() // pie查询，就把所有的都返回出去; 其中第一个是key+freq
+    inline vector<pair<int, int>> pie_query() 
     {
         vector<pair<int, int>> res;
         for (int i = 0; i < n_entries; i++)
@@ -151,7 +149,7 @@ public:
     }
 
     void clear_all()
-    { // 清空
+    { 
         key = 0, freq = 0, vote = 0, acc = 0;
         for (int i = 0; i < n_entries; i++)
         {
@@ -162,16 +160,7 @@ public:
 
     void show_info()
     {
-        ofstream ininfo("InternalInfo/LAT_BASIC.txt", ios::app);
-        ininfo << "key=" << key << endl;
-        ininfo << "freq=" << freq << endl;
-        ininfo << "vote=" << vote << endl;
-        ininfo << "acc=" << acc << endl;
-        for (int i = 0; i < n_entries; i++)
-        {
-            ininfo << entry[i].first << " " << entry[i].second << endl;
-        }
-        ininfo.close();
+
     }
 };
 
@@ -266,13 +255,7 @@ public:
 
     void show_info()
     {
-        for (int i = 0; i < n_cells; i++)
-        {
-            ofstream ininfo("InternalInfo/LAT_BASIC.txt", ios::app);
-            ininfo << "======================================" << endl;
-            cellgroup[i].show_info();
-            ininfo.close();
-        }
+
     }
 };
 
@@ -300,8 +283,8 @@ public:
         theta = THE;
         filter_thres = THRES;
         ffg = true;
-        n_buckets = int(memory_KB * (1 - FILTER_RATIO)) * 1024 * 8 / (n_cells * (8 + 24 + 16 + 16 + n_entries * (16 + 16))); // 实际没这么大！！
-        filter = new Filter_BASIC<ID_TYPE>(int((FILTER_RATIO)*memory_KB));                                                   // 单个cell大小 =  32(key)+32(freq)+32(vote)+ 32(acc)+n_entries*(32+32))    默认全是32位！！！
+        n_buckets = int(memory_KB * (1 - FILTER_RATIO)) * 1024 * 8 / (n_cells * (8 + 24 + 16 + 16 + n_entries * (16 + 16))); 
+        filter = new Filter_BASIC<ID_TYPE>(int((FILTER_RATIO)*memory_KB));                                                   
         bucketgroup = new Bucket_BAISIC<ID_TYPE>[n_buckets];
 
         for (int i = 0; i < n_buckets; i++)
@@ -318,7 +301,7 @@ public:
         theta = THE;
         ffg = whether_filter;
 
-        n_buckets = (memory_KB * 1024 * 8) / (n_cells * (8 + 24 + 16 + 16 + n_entries * (16 + 16))); // 实际没这么大！！
+        n_buckets = (memory_KB * 1024 * 8) / (n_cells * (8 + 24 + 16 + 16 + n_entries * (16 + 16))); 
         bucketgroup = new Bucket_BAISIC<ID_TYPE>[n_buckets];
         for (int i = 0; i < n_buckets; i++)
         {
@@ -337,30 +320,24 @@ public:
             }
         }
 
-        uint32_t index = mhash(id, 100) % n_buckets; // hash到一个bucket中
+        uint32_t index = mhash(id, 100) % n_buckets; 
         bucketgroup[index].insert(id, value);
     }
 
     inline int point_query(ID_TYPE id, int value)
     {
-        uint32_t index = mhash(id, 100) % n_buckets; // hash到一个bucket中
+        uint32_t index = mhash(id, 100) % n_buckets; 
         return bucketgroup[index].point_query(id, value);
     }
 
     inline vector<pair<int, int>> pie_query(ID_TYPE id)
     {
-        uint32_t index = mhash(id, 100) % n_buckets; // hash到一个bucket中
+        uint32_t index = mhash(id, 100) % n_buckets;
         return bucketgroup[index].pie_query(id);
     }
 
     void show_info()
     {
-        ofstream ininfo("InternalInfo/LAT_BASIC.txt", ios::out | ios::trunc);
-        for (int i = 0; i < n_buckets; i++)
-        {
 
-            bucketgroup[i].show_info();
-        }
-        ininfo.close();
     }
 };
