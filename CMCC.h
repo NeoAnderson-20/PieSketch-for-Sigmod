@@ -16,7 +16,6 @@ class CMCC
 {
 public:
     int d;
-    // pair<int, int> **array;
     int w;
     int n_slots;
     vector<vector<vector<pair<int, int>>>> array;
@@ -27,12 +26,12 @@ public:
     {
         n_slots = N_SLOTS;
         d = D;
-        w = memory_KB * 1024 * 8 / (n_slots * (32 + 32) * d); // 每个counter是多个slot
+        w = memory_KB * 1024 * 8 / (n_slots * (32 + 32) * d); 
         array.resize(d, vector<vector<pair<int, int>>>(w, vector<pair<int, int>>(n_slots, make_pair(0, 0))));
 
     }
 
-    void insert(ID_TYPE id, int value, int f = 1) // 返回查询结果
+    void insert(ID_TYPE id, int value, int f = 1) 
     {
         uint32_t index;
         int minpos = -1;
@@ -66,8 +65,7 @@ public:
             }
             if (!flg)
             {
-                // array[i][index][minpos].first = value; // 没有匹配到，没有空位，则替换最小的
-                // array[i][index][minpos].second = 1;
+            
 
                 if(array[i][index][minpos].second == 1){
                     array[i][index][minpos].first = value;
@@ -80,7 +78,7 @@ public:
         }
     }
 
-    int point_query(ID_TYPE id, int value) // 返回查询结果
+    int point_query(ID_TYPE id, int value) 
     {
         uint32_t index;
         int res = inf;

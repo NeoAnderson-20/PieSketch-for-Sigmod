@@ -100,7 +100,7 @@ public:
         return 0;
     }
 
-    vector<pair<int, int>> pie_query() // 排序一下,然后返回，作为pie估计结果
+    vector<pair<int, int>> pie_query() 
     {
         vector<pair<int, int>> res;
         for (int i = 0; i < n_slots; i++)
@@ -168,7 +168,7 @@ public:
     Hist_01(int memory_KB, int N_SLOTS, double CM_RATIO)
     {
         n_slots = N_SLOTS;
-        n_buckets = memory_KB * (1 - CM_RATIO) * 1024 * 8 / (32 + 32 + 2 * n_slots * (16 + 16)); // 注意，hist有2层的n_slots！
+        n_buckets = memory_KB * (1 - CM_RATIO) * 1024 * 8 / (32 + 32 + 2 * n_slots * (16 + 16));  
         buckets = new Hist_Bucket<ID_TYPE>[n_buckets];
         for (int i = 0; i < n_buckets; i++)
         {
@@ -188,7 +188,7 @@ public:
                 string strA = to_string(id).substr(0, 8);
                 string strB = to_string(rs.first).substr(0, 5);
                 string strC = strA + strB;
-                uint64_t c = stoll(strC); // 超出长度，需要截断！！！
+                uint64_t c = stoll(strC); 
                 cm_hist->insert(c, rs.second);
             }
             else
@@ -196,12 +196,11 @@ public:
                 string strA = to_string(id).substr(0, 8);
                 string strB = to_string(value).substr(0, 5);
                 string strC = strA + strB;
-                uint64_t c = stoll(strC); // 超出长度，需要截断！！！
+                uint64_t c = stoll(strC);
                 cm_hist->insert(c, 1);
             }
             return;
         }
-        // 务必确认有没有问题！
         if (buckets[bucket_index].K == 0)
         {
             buckets[bucket_index].K = id;
@@ -247,7 +246,7 @@ public:
         vector<pair<int, int>> res;
 
         int bucket_index = mhash(id, 250) % n_buckets;
-        if (buckets[bucket_index].K == id) // 匹配到bucket
+        if (buckets[bucket_index].K == id)  
         {
             return buckets[bucket_index].pie_query();
         }

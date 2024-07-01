@@ -42,7 +42,6 @@ bool comparePairs(const pair<int, int> &left, pair<int, int> &right)
     return left.second > right.second;
 }
 
-// * 计算，两个pie_chart的值误差
 double calculateTotalDifference(const uint64_t k, const vector<pair<int, int>> &v1, const vector<pair<int, int>> &v2, double portion_thres)
 {
     int real_sum = ground_truth_size[k];
@@ -82,7 +81,6 @@ double calculateTotalDifference(const uint64_t k, const vector<pair<int, int>> &
     return totalDifference / real_sum;
 }
 
-// * 计算，两个pie_chart的比例误差
 double calculatePortionDifference(const uint64_t k, const vector<pair<int, int>> &v1, const vector<pair<int, int>> &v2, double portion_thres)
 {
     double real_sum = ground_truth_size[k];
@@ -185,10 +183,7 @@ void Find_Best_Param(int MEM_RANGE[], int s1, int FILTER_THRES_RANGE[], int s2,
         }
     }
     cout << "Total Sketches = " << vf_pies.size() << endl;
-    // time_t now = time(nullptr);
-    // tm *local_time = localtime(&now);
-    // char time_str[20];
-    // strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", local_time);
+
     readTrace(path, traces);
     total_packet = traces.size();
     cout << "total_packet=" << total_packet << endl;
@@ -208,7 +203,6 @@ void Find_Best_Param(int MEM_RANGE[], int s1, int FILTER_THRES_RANGE[], int s2,
         uint64_t dst = it->dst;
         int pkt_size = it->packet_size;
 
-        // uint16_t srcFp = getFP(src);    // fingerprint
         uint64_t srcFp = src;
 
         int turn = 0;
@@ -243,7 +237,6 @@ void Find_Best_Param(int MEM_RANGE[], int s1, int FILTER_THRES_RANGE[], int s2,
         sorted_ground_truth[outerPair.first] = tempVector;
     }
 
-    // 至此，全部插入完成。 开始查询与写入文件
 
     map<int, double> are_pies;
     map<int, double> are_mors;
@@ -257,7 +250,7 @@ void Find_Best_Param(int MEM_RANGE[], int s1, int FILTER_THRES_RANGE[], int s2,
 
         if (ground_truth_size[it->first] < flow_thres)
         {
-            continue; // 跳过小于FLOW_THRESH的流
+            continue; 
         }
 
         total_estimated_flows++;
@@ -271,7 +264,7 @@ void Find_Best_Param(int MEM_RANGE[], int s1, int FILTER_THRES_RANGE[], int s2,
             topV--;
             if (ground_truth_size[it->first] != 0 && (double)it2->second / ground_truth_size[it->first] < portion_thres)
             {
-                break; // 占比小于5%的直接滚蛋！！！
+                break; 
             }
             total_estimated_items++;
             int turn = 0;
@@ -299,16 +292,11 @@ void Find_Best_Param(int MEM_RANGE[], int s1, int FILTER_THRES_RANGE[], int s2,
         }
     }
 
-    // 至此，查询完成，开始输出结果
     ofstream resfile(res_param_path, ios::app);
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
     std::tm *localTime = std::localtime(&currentTime);
 
-    // 输出本地时间的各个组成部分
-    // resfile << std::put_time(localTime, "%y-%m-%d %H:%M:%S") << endl;
-    // resfile << "FLOW_THRESH = " << flow_thres << ", PORTION_THRESH=" << portion_thres << endl;
-    // resfile << "MEMORY,Filter_THRESH,FILTER_PERCENT,N_CELLS,N_ENTRIES,LAMDBA,THETH,MOR_SIZE,PIE_ARE,MOR_ARE,PIE_INSERT_TPR,PIE_QUERY_TPR,MOR_INSERT_TPR,MOR_QUERY_TPR" << endl;
 
     reverse(vf_mem.begin(), vf_mem.end());
     reverse(vf_filter_thresh_range.begin(), vf_filter_thresh_range.end());
@@ -360,18 +348,7 @@ void Find_Best_Param(int MEM_RANGE[], int s1, int FILTER_THRES_RANGE[], int s2,
 
         printf("=================================================\n");
 
-        // resfile << _mem << "," << _filter_thres << "," << _filter_percent << "," << _n_cells << "," << _n_entries << "," << _lambda << "," << _theta << "," << _mor_size << "," << are_pie_final << "," << are_mor_final << "," << insert_tpr_pie << "," << query_tpr_pie << ","
-        //         << insert_tpr_mor << "," << query_tpr_mor << endl;
 
-        // //! N_CE
-        // resfile <<_n_cells << ","<< _mem  << "," << are_pie_final << "," << are_mor_final << "," << insert_tpr_pie << "," << query_tpr_pie << ","
-        //         << insert_tpr_mor << "," << query_tpr_mor << endl;
-        // //! N_CE
-
-        //! N_ET
-        resfile << _n_entries << "," << _mem << "," << are_pie_final << "," << are_mor_final << "," << insert_tpr_pie << "," << query_tpr_pie << ","
-                << insert_tpr_mor << "," << query_tpr_mor << endl;
-        //! N_ET
     }
     resfile.close();
 }
@@ -386,7 +363,6 @@ void Comp(int MEM_RANGE[], int S1, int FLOW_THRES_CMP, double PORTION_THRES_CMP,
     int lambda = THE;
     int mor_size = MORS;
     int f_thres = FTHRES;
-    //! 对比算法的配置
 
     PIE_BAISIC<uint64_t> *basics[S1];
     PIE_M1<uint64_t> *mors[S1];
@@ -397,7 +373,7 @@ void Comp(int MEM_RANGE[], int S1, int FLOW_THRES_CMP, double PORTION_THRES_CMP,
     for (int i = 0; i < S1; i++)
     {
         basics[i] = new PIE_BAISIC<uint64_t>(MEM_RANGE[i], f_ratio, n_ce, n_et, lambda, theta, f_thres, false);
-        hists[i] = new Hist_01<uint64_t>(MEM_RANGE[i], 16, 0.5); // n_slots & cm_ratio,默认配置
+        hists[i] = new Hist_01<uint64_t>(MEM_RANGE[i], 16, 0.5); 
         cmccs[i] = new CMCC<uint64_t>(MEM_RANGE[i], 16, 3);
         mors[i] = new PIE_M1<uint64_t>(MEM_RANGE[i], f_ratio, n_ce, n_et, lambda, theta, f_thres, mor_size, false);
         simds[i] = new Pie_SIMD(MEM_RANGE[i]);
@@ -466,7 +442,6 @@ void Comp(int MEM_RANGE[], int S1, int FLOW_THRES_CMP, double PORTION_THRES_CMP,
         sorted_ground_truth[outerPair.first] = tempVector;
     }
 
-    // 至此，全部插入完成。 开始查询与写入文件
     map<int, double> are_pies;
     map<int, double> are_mors;
     map<int, double> query_times_pies;
@@ -491,7 +466,7 @@ void Comp(int MEM_RANGE[], int S1, int FLOW_THRES_CMP, double PORTION_THRES_CMP,
 
         if (ground_truth_size[it->first] < FLOW_THRES_CMP)
         {
-            continue; // 跳过小于FLOW_THRESH的流
+            continue;
         }
 
         total_estimated_flows++;
@@ -506,7 +481,7 @@ void Comp(int MEM_RANGE[], int S1, int FLOW_THRES_CMP, double PORTION_THRES_CMP,
             topV--;
             if (ground_truth_size[it->first] != 0 && (double)it2->second / ground_truth_size[it->first] < PORTION_THRES_CMP)
             {
-                break; // 占比小于5%的直接滚蛋！！！
+                break; 
             }
             total_estimated_items++;
 
@@ -552,7 +527,6 @@ void Comp(int MEM_RANGE[], int S1, int FLOW_THRES_CMP, double PORTION_THRES_CMP,
     std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
     std::tm *localTime = std::localtime(&currentTime);
 
-    // 输出本地时间的各个组成部分
     std::cout << "Formatted Local Time: ";
     std::cout << std::put_time(localTime, "%y-%m-%d %H:%M:%S") << std::endl;
 
@@ -609,7 +583,6 @@ void Comp_PIE(int MEM_RANGE[], int S1, int FLOW_THRES_PIE, double PORTION_THRES_
     int lambda = THE;
     int mor_size = MORS;
     int f_thres = FTHRES;
-    //! 对比算法的配置
 
     PIE_BAISIC<uint64_t> *basics[S1];
     PIE_M1<uint64_t> *mors[S1];
@@ -619,7 +592,7 @@ void Comp_PIE(int MEM_RANGE[], int S1, int FLOW_THRES_PIE, double PORTION_THRES_
     for (int i = 0; i < S1; i++)
     {
         basics[i] = new PIE_BAISIC<uint64_t>(MEM_RANGE[i], f_ratio, n_ce, n_et, lambda, theta, f_thres, false);
-        hists[i] = new Hist_01<uint64_t>(MEM_RANGE[i], 16, 0.5); // n_slots & cm_ratio,默认配置
+        hists[i] = new Hist_01<uint64_t>(MEM_RANGE[i], 16, 0.5); 
         cmccs[i] = new CMCC<uint64_t>(MEM_RANGE[i], 16, 3);
         mors[i] = new PIE_M1<uint64_t>(MEM_RANGE[i], f_ratio, n_ce, n_et, lambda, theta, f_thres, mor_size, false);
     }
@@ -742,7 +715,6 @@ void Comp_PIE(int MEM_RANGE[], int S1, int FLOW_THRES_PIE, double PORTION_THRES_
             pre_cmcc[i] += calculateTotalDifference(it->first, truth_vector, pie_of_cmcc, PORTION_THRES_PIE);
             pre_mor[i] += calculateTotalDifference(it->first, truth_vector, pie_of_mor, PORTION_THRES_PIE);
 
-            //! 百分比误差，计算CC所占百分比的误差
             pre_basic_portion[i] += calculatePortionDifference(it->first, truth_vector, pie_of_baisc, PORTION_THRES_PIE);
             pre_hist_portion[i] += calculatePortionDifference(it->first, truth_vector, pie_of_hist, PORTION_THRES_PIE);
             pre_cmcc_portion[i] += calculatePortionDifference(it->first, truth_vector, pie_of_cmcc, PORTION_THRES_PIE);
@@ -755,7 +727,6 @@ void Comp_PIE(int MEM_RANGE[], int S1, int FLOW_THRES_PIE, double PORTION_THRES_
     time_t currentTime = std::chrono::system_clock::to_time_t(now);
     tm *localTime = std::localtime(&currentTime);
 
-    // 输出本地时间的各个组成部分
     // std::cout << "Formatted Local Time: ";
     // std::cout << std::put_time(localTime, "%y-%m-%d %H:%M:%S") << std::endl;
 
@@ -807,7 +778,6 @@ void Comp_PIE(int MEM_RANGE[], int S1, int FLOW_THRES_PIE, double PORTION_THRES_
 int main()
 {
 
-    // //!  参数调节！
     // int param_mem_range[] = {800};
     // int param_filter_thresh_range[] = {10};
     // double param_filter_percent_range[] = {0.025};
@@ -819,7 +789,6 @@ int main()
     // int param_flow_thres = 700;
     // double param_portion_thres = 0.1;
 
-    // // !  参数调节！
 
     // size_t size_mem = std::size(param_mem_range);
     // size_t size_filter_thresh = std::size(param_filter_thresh_range);
@@ -837,11 +806,11 @@ int main()
 
     int cmp_mem_range[] = {300, 400, 500, 600, 700, 800};
     // int cmp_mem_range[] = {600};
-    int cmp_flow_thres = 700; //! 确认是700 ！！！  300kb时小于0.1
+    int cmp_flow_thres = 700; 
     double cmp_portion_thres = 0.1;
     double f_ratio = 0.025;
     int f_thres = 10;
-    int n_et = 8; //! 4->8
+    int n_et = 8;
     int n_ce = 8;
     int theta = 2;
     int lambda = 3;
@@ -863,4 +832,3 @@ int main()
     return 0;
 }
 
-// todo 加一个key ratio = 总误差小于一定值的key的占比 XX 暂时没必要

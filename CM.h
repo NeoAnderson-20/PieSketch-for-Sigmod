@@ -13,7 +13,7 @@ public:
     CMSKETCH() {}
     CMSKETCH(int memory_KB)
     {   
-        w = memory_KB * 1024 * 8 / 8 / d; // 这里每个counter 只要设置8位！
+        w = memory_KB * 1024 * 8 / 8 / d; 
         array = new int *[d];
         for (int i = 0; i < d; i++)
         {
@@ -22,19 +22,17 @@ public:
         }
     }
 
-    void insert(ID_TYPE id, int f = 1) // 返回查询结果
+    void insert(ID_TYPE id, int f = 1) 
     {
-        // cout << id<<" "<<f << endl;
 
         uint32_t index;
         for (int i = 0; i < d; i++)
         {
-            // cout << i << endl;
             index = mhash(id, i * 100) % w;
             array[i][index] += f;
         }
     }
-    int query(ID_TYPE id) // 返回查询结果
+    int query(ID_TYPE id) 
     {
         int result = inf;
         uint32_t index;

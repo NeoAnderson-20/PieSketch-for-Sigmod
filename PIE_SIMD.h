@@ -25,7 +25,7 @@ struct Bucket_SIMD
 
     inline uint32_t Match_Key(const uint32_t item_key)
     {
-        __m256i vec = _mm256_set1_epi32(item_key); //! 这里去256/32 ， 试试512/32
+        __m256i vec = _mm256_set1_epi32(item_key); 
         __m256i cmp = _mm256_cmpeq_epi32(vec, _mm256_loadu_si256((__m256i *)keys));
         return _mm256_movemask_ps((__m256)cmp);
     }
@@ -41,18 +41,17 @@ struct Bucket_SIMD
     {
         uint32_t match_key = Match_Key(item_key);
         if (match_key != 0)
-        { // 匹配到了key
+        {
 
-            uint32_t idx_of_key = __builtin_ctz(match_key); // 获得索引 __builtin_ctz!!!
+            uint32_t idx_of_key = __builtin_ctz(match_key); 
             freqs[idx_of_key]++;
 
             uint32_t match_value = Match_Value(item_value, idx_of_key);
-            if (match_value != 0) // 匹配到了value
+            if (match_value != 0)
             {
                 uint32_t idx_of_value = __builtin_ctz(match_value);
                 entry_v[idx_of_key][idx_of_value]++;
 
-                // 排序
                 if (idx_of_value > 0)
                 {
                     if (entry_v[idx_of_key][idx_of_value] > entry_v[idx_of_key][idx_of_value - 1])
@@ -62,17 +61,17 @@ struct Bucket_SIMD
                     }
                 }
             }
-            else // 没匹配到value
+            else 
             {
-                match_value = Match_Value(0, idx_of_key); // 匹配value = 0
+                match_value = Match_Value(0, idx_of_key); 
                 if (match_value != 0)
-                { // 如果匹配到了 0
+                { 
                     uint32_t idx_of_value = __builtin_ctz(match_value);
                     entry_k[idx_of_key][idx_of_value] = item_value;
                     entry_v[idx_of_key][idx_of_value] = 1;
                 }
                 else
-                { // 无空位！！！
+                {
                     acc[idx_of_key]++;
                     if (acc[idx_of_key] / entry_v[idx_of_key][7] > theta)
                     {
@@ -84,7 +83,7 @@ struct Bucket_SIMD
         }
         else
         {
-            match_key = Match_Key(0); // 匹配 key = 0;
+            match_key = Match_Key(0); 
             if (match_key != 0)
             {
                 uint32_t idx_of_key = __builtin_ctz(match_key);
@@ -94,7 +93,7 @@ struct Bucket_SIMD
                 entry_v[idx_of_key][0] = 1;
             }
             else
-            { // 替换最小的
+            { 
                 auto min_it = min_element(begin(freqs), end(freqs));
                 int min_index = distance(begin(freqs), min_it);
                 neg[min_index]++;
@@ -115,8 +114,8 @@ struct Bucket_SIMD
     {
         uint32_t match_key = Match_Key(item_key);
         if (match_key != 0)
-        {                                                   // 匹配到了key
-            uint32_t idx_of_key = __builtin_ctz(match_key); // 获得索引
+        {                                                   
+            uint32_t idx_of_key = __builtin_ctz(match_key); 
             uint32_t match_value = Match_Value(item_value, idx_of_key);
             if (match_value != 0)
             {
